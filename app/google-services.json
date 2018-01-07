@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "976767993544-dgr5dijup9p9n5964av0ovusashiajj4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.cloudtasks",
+            "certificate_hash": "e300ea7728a625e1d02f9323610de5e632b3f080"
+          }
+        },
+        {
           "client_id": "976767993544-2sq5b9ad58poef7sf2smgn4apbb69924.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
