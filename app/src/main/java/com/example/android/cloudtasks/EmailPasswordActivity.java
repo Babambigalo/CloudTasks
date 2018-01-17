@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -15,164 +18,219 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class EmailPasswordActivity extends AppCompatActivity implements View.OnClickListener {
+public class EmailPasswordActivity extends AppCompatActivity  {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private EditText ETemail;
-    private EditText ETpassword;
+    String TAG = "EmailPasswordActivity";
+    EditText ETemail;
+    EditText ETpassword;
+    Button bReg;
+    Button bSign;
+
+
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_password);
-
         mAuth = FirebaseAuth.getInstance();
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                if (firebaseUser != null) {
-                    Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
-                    startActivity(intent);
-
-                    // Do whatever you want with the UserId by firebaseUser.getUid()
-                    //Log.d("TAG", "onAuthStateChanged:signed_in:" + firebaseUser.getUid());
-                } else {
-                    Log.d("TAG", "onAuthStateChanged:signed_out");
-                }
-            }
-        };
-
+        bReg = findViewById(R.id.btn_registration);
+        bSign = findViewById(R.id.btn_sign_in);
         ETemail = findViewById(R.id.et_email);
         ETpassword = findViewById(R.id.et_password);
 
-
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
-            startActivity(intent);
-
-        }
-        findViewById(R.id.btn_sign_in).setOnClickListener(this);
-        findViewById(R.id.btn_registration).setOnClickListener(this);
-    }
+        Toolbar myToolbar =  findViewById(R.id.myToolbar);
+        setSupportActionBar(myToolbar);
 
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btn_sign_in) {
-            signin(ETemail.getText().toString(), ETpassword.getText().toString());
-        } else if (v.getId() == R.id.btn_registration) {
-            registration(ETemail.getText().toString(), ETpassword.getText().toString());
 
-        }
-    }
 
-    public void signin(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        bSign.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(EmailPasswordActivity.this, "авторизация успешна", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                if (ETemail.getText().toString().length()!= 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() != null ){
+                    signIn(ETemail.getText().toString(),ETpassword.getText().toString());
+                    Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
+                    startActivity(intent);
 
-                } else {
-                    Toast.makeText(EmailPasswordActivity.this, "авторизация провалена", Toast.LENGTH_SHORT).show();
+                }else if (ETemail.getText().toString().length()!= 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() == null){
+                    Log.v(TAG,"user = " + mAuth.getCurrentUser());
+                    Toast.makeText(EmailPasswordActivity.this,"User not found",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(EmailPasswordActivity.this,"fill all fields ",Toast.LENGTH_SHORT).show();
                 }
+
 
             }
         });
-    }
-
-    public void registration(String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        bReg.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d("TAG","Successful?  " + task.getException());
-                if (task.isSuccessful()) {
-                    Toast.makeText(EmailPasswordActivity.this, "регистрация успешна", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(EmailPasswordActivity.this, "регистрация провалена", Toast.LENGTH_SHORT).show();
-                }
+            public void onClick(View v) {
+                registration(ETemail.getText().toString(),ETpassword.getText().toString());
             }
         });
-    }
+
+        //mAuth.addAuthStateListener(mAuthStateListener);
 
 
 
-//    private FirebaseAuth mAuth;
-//    private FirebaseAuth.AuthStateListener mAuthListener;
-//
-//    private EditText ETemail;
-//    private EditText ETpassword;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_email_password);
-//
+
+
 //        mAuth = FirebaseAuth.getInstance();
 //
-//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
 //            @Override
 //            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser user = firebaseAuth.getCurrentUser();
-//                if (user != null) {
-//                    // User is signed in
+//                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+//                if (firebaseUser != null) {
+//                    Intent intent = new Intent(EmailPasswordActivity.this, ListTasks.class);
+//                    startActivity(intent);
 //
+//                    // Do whatever you want with the UserId by firebaseUser.getUid()
+//                    //Log.d("TAG", "onAuthStateChanged:signed_in:" + firebaseUser.getUid());
 //                } else {
-//                    // User is signed out
-//
+//                    Log.d("TAG", "onAuthStateChanged:signed_out");
 //                }
-//
 //            }
 //        };
 //
-//        ETemail = (EditText) findViewById(R.id.et_email);
-//        ETpassword = (EditText) findViewById(R.id.et_password);
+//        ETemail = findViewById(R.id.et_email);
+//        ETpassword = findViewById(R.id.et_password);
 //
+//
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if (user != null) {
+//            //Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
+//            //startActivity(intent);
+//            Log.d("TAG", "onAuthStateChanged:signed_out");
+//
+//        }
 //        findViewById(R.id.btn_sign_in).setOnClickListener(this);
 //        findViewById(R.id.btn_registration).setOnClickListener(this);
 //    }
 //
-//    @Override
-//    public void onClick(View view) {
-//        if(view.getId() == R.id.btn_sign_in)
-//        {
-//            signin(ETemail.getText().toString(),ETpassword.getText().toString());
-//        }else if (view.getId() == R.id.btn_registration)
-//        {
-//            registration(ETemail.getText().toString(),ETpassword.getText().toString());
-//        }
 //
+//    @Override
+//    public void onClick(View v) {
+//        if (v.getId() == R.id.btn_sign_in) {
+//            signin(ETemail.getText().toString(), ETpassword.getText().toString());
+//        } else if (v.getId() == R.id.btn_registration) {
+//            registration(ETemail.getText().toString(), ETpassword.getText().toString());
+//
+//        }
 //    }
 //
-//    public void signin(String email , String password)
-//    {
-//        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+//    public void signin(String email, String password) {
+//        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 //            @Override
 //            public void onComplete(@NonNull Task<AuthResult> task) {
-//                if(task.isSuccessful()) {
-//                    Toast.makeText(EmailPasswordActivity.this, "Aвторизация успешна", Toast.LENGTH_SHORT).show();
-//                }else
-//                    Toast.makeText(EmailPasswordActivity.this, "Aвторизация провалена", Toast.LENGTH_SHORT).show();
+//                if (task.isSuccessful()) {
+//                    Toast.makeText(EmailPasswordActivity.this, "авторизация успешна", Toast.LENGTH_SHORT).show();
+//
+//                } else {
+//                    Toast.makeText(EmailPasswordActivity.this, "авторизация провалена", Toast.LENGTH_SHORT).show();
+//                }
 //
 //            }
 //        });
 //    }
-//    public void registration (String email , String password){
+//
+//    public void registration(String email, String password) {
 //        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 //            @Override
 //            public void onComplete(@NonNull Task<AuthResult> task) {
-//                Log.d("TAG","Successful?  " + task.getException());
-//                if(task.isSuccessful())
-//                {
-//                    Toast.makeText(EmailPasswordActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+//                Log.d("TAG", "Successful?  " + task.getException());
+//                if (task.isSuccessful()) {
+//                    Toast.makeText(EmailPasswordActivity.this, "регистрация успешна", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    Toast.makeText(EmailPasswordActivity.this, "регистрация провалена", Toast.LENGTH_SHORT).show();
 //                }
-//                else
-//                    Toast.makeText(EmailPasswordActivity.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
 //            }
 //        });
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        return true;
+    }
+
+    public void signIn(String email, String password){
+        ETemail = findViewById(R.id.et_email);
+        ETpassword = findViewById(R.id.et_password);
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUI(user);
+                }else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithEmail:failure", task.getException());
+                    Toast.makeText(EmailPasswordActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    updateUI(null);
+                }
+
+            }
+
+        });
+    }
+
+    public void registration(String email,String password){
+        ETemail = findViewById(R.id.et_email);
+        ETpassword = findViewById(R.id.et_password);
+        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "createUserWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUI(user);
+                }else{
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                    Toast.makeText(EmailPasswordActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
+                    updateUI(null);
+                }
+            }
+        });
+    }
+
+
+    public void updateUI(FirebaseUser user) {
+        if (mAuth.getCurrentUser() != null){
+            Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
+            startActivity(intent);
+        }else {
+            Log.v(TAG,"User not authenticate  " + mAuth.getCurrentUser());
+        }
+    }
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        FirebaseAuth.getInstance().signOut();
 //    }
 
 }
+
+
+
+
+
