@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +27,9 @@ public class EmailPasswordActivity extends AppCompatActivity  {
     EditText ETpassword;
     Button bReg;
     Button bSign;
+    MenuItem item;
+
+
 
 
 
@@ -44,18 +47,16 @@ public class EmailPasswordActivity extends AppCompatActivity  {
         setSupportActionBar(myToolbar);
 
 
-
-
         bSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ETemail.getText().toString().length()!= 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() != null ){
+                if (ETemail.getText().toString().length()!= 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() != null){
                     signIn(ETemail.getText().toString(),ETpassword.getText().toString());
                     Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
                     startActivity(intent);
 
                 }else if (ETemail.getText().toString().length()!= 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() == null){
-                    Log.v(TAG,"user = " + mAuth.getCurrentUser());
+                    //Log.v(TAG,"user = " + mAuth.getCurrentUser());
                     Toast.makeText(EmailPasswordActivity.this,"User not found",Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(EmailPasswordActivity.this,"fill all fields ",Toast.LENGTH_SHORT).show();
@@ -67,87 +68,17 @@ public class EmailPasswordActivity extends AppCompatActivity  {
         bReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registration(ETemail.getText().toString(),ETpassword.getText().toString());
+                if (ETemail.getText().toString().length() != 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() != null) {
+                    registration(ETemail.getText().toString(), ETpassword.getText().toString());
+                }else if (ETemail.getText().toString().length() != 0 & ETpassword.getText().toString().length() != 0 & mAuth.getCurrentUser() == null){
+                    Toast.makeText(EmailPasswordActivity.this,"fill all fields ",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(EmailPasswordActivity.this,"registration is falls ",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        //mAuth.addAuthStateListener(mAuthStateListener);
 
-
-
-
-
-//        mAuth = FirebaseAuth.getInstance();
-//
-//        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-//                if (firebaseUser != null) {
-//                    Intent intent = new Intent(EmailPasswordActivity.this, ListTasks.class);
-//                    startActivity(intent);
-//
-//                    // Do whatever you want with the UserId by firebaseUser.getUid()
-//                    //Log.d("TAG", "onAuthStateChanged:signed_in:" + firebaseUser.getUid());
-//                } else {
-//                    Log.d("TAG", "onAuthStateChanged:signed_out");
-//                }
-//            }
-//        };
-//
-//        ETemail = findViewById(R.id.et_email);
-//        ETpassword = findViewById(R.id.et_password);
-//
-//
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        if (user != null) {
-//            //Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
-//            //startActivity(intent);
-//            Log.d("TAG", "onAuthStateChanged:signed_out");
-//
-//        }
-//        findViewById(R.id.btn_sign_in).setOnClickListener(this);
-//        findViewById(R.id.btn_registration).setOnClickListener(this);
-//    }
-//
-//
-//    @Override
-//    public void onClick(View v) {
-//        if (v.getId() == R.id.btn_sign_in) {
-//            signin(ETemail.getText().toString(), ETpassword.getText().toString());
-//        } else if (v.getId() == R.id.btn_registration) {
-//            registration(ETemail.getText().toString(), ETpassword.getText().toString());
-//
-//        }
-//    }
-//
-//    public void signin(String email, String password) {
-//        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<AuthResult> task) {
-//                if (task.isSuccessful()) {
-//                    Toast.makeText(EmailPasswordActivity.this, "авторизация успешна", Toast.LENGTH_SHORT).show();
-//
-//                } else {
-//                    Toast.makeText(EmailPasswordActivity.this, "авторизация провалена", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            }
-//        });
-//    }
-//
-//    public void registration(String email, String password) {
-//        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<AuthResult> task) {
-//                Log.d("TAG", "Successful?  " + task.getException());
-//                if (task.isSuccessful()) {
-//                    Toast.makeText(EmailPasswordActivity.this, "регистрация успешна", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Toast.makeText(EmailPasswordActivity.this, "регистрация провалена", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
 
 
     }
@@ -161,11 +92,7 @@ public class EmailPasswordActivity extends AppCompatActivity  {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
-        return true;
-    }
+
 
     public void signIn(String email, String password){
         ETemail = findViewById(R.id.et_email);
@@ -218,15 +145,13 @@ public class EmailPasswordActivity extends AppCompatActivity  {
             Intent intent = new Intent(EmailPasswordActivity.this,ListTasks.class);
             startActivity(intent);
         }else {
-            Log.v(TAG,"User not authenticate  " + mAuth.getCurrentUser());
+            return;
         }
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        FirebaseAuth.getInstance().signOut();
-//    }
+
+
+
 
 }
 
