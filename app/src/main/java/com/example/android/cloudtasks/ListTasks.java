@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +22,8 @@ public class ListTasks extends AppCompatActivity {
     private FirebaseDatabase database;
     private DatabaseReference myRef;
     private FirebaseUser user;
+    private EditText ETTask;
+    private EditText ETdate;
 
 
     @Override
@@ -36,7 +39,6 @@ public class ListTasks extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         String id = user.getUid();
-        Log.v(TAG,"userId = " + id);
 
         myRef = database.getReference();
         myRef.setValue("0","ЙО");
