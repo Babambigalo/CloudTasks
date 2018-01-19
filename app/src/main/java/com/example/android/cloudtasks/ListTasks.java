@@ -10,13 +10,18 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ListTasks extends AppCompatActivity {
 
-    ListView ListUserTasks;
-
+    private ListView ListUserTasks;
     private static final String TAG = "ListTasks";
-    //private MenuItem signOut;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+    private FirebaseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,43 +32,19 @@ public class ListTasks extends AppCompatActivity {
         Toolbar myToolbar =  findViewById(R.id.myToolbar);
         setSupportActionBar(myToolbar);
 
-        ListUserTasks = findViewById(R.id.discr_for_task);
+        database = FirebaseDatabase.getInstance();
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        String id = user.getUid();
+        Log.v(TAG,"userId = " + id);
 
-//        signOut = findViewById(R.id.action_sign_out);
-//        signOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                FirebaseAuth.getInstance().signOut();
-//                return false;
-//            }
-//        });
+        myRef = database.getReference();
+        myRef.setValue("0","ЙО");
 
-
+        ListUserTasks = findViewById(R.id.listTasks);
 
 
 
-
-
-
-
-
-
-
-
-
-//        myRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String value = dataSnapshot.getValue(String.class);
-//                Log.d("TAG", "Value is: " + value);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
 
 
