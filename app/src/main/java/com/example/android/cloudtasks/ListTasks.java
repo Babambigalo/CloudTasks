@@ -117,14 +117,21 @@ public class ListTasks extends AppCompatActivity {
 
 
     private void showData(DataSnapshot dataSnapshot) {
+        int i = 0;
+        ArrayList<Tasks> tasks  = new ArrayList<>();
+        String id = user.getUid()
        for (DataSnapshot ds : dataSnapshot.getChildren()){
-           
+
+           tasks.add(new Tasks(ds.child(id).child(i+1).getValue(Tasks.class).getmTask()),ds.child(id).child(i+1).getValue(Tasks.class).getmDate());
+
 
 
        }
 
 
     }
+
+
 
 
 
