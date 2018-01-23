@@ -1,6 +1,6 @@
 package com.example.android.cloudtasks;
 
-import android.content.Context;
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -18,10 +18,12 @@ import java.util.ArrayList;
 public class TasksAdapter extends ArrayAdapter<Tasks> {
 
 
-    public TasksAdapter(@NonNull Context context, ArrayList<Tasks> tasks) {
+
+
+
+    public TasksAdapter(Activity context, @NonNull ArrayList<Tasks> tasks) {
         super(context, 0, tasks);
     }
-
 
     @NonNull
     @Override
@@ -30,10 +32,10 @@ public class TasksAdapter extends ArrayAdapter<Tasks> {
         if(convertView == null){
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_2,parent,false);
         }
-        TextView textTask = convertView.findViewById(R.id.text1);
-        TextView textDate = convertView.findViewById(R.id.text2);
+        TextView textTask = convertView.findViewById(android.R.id.text2);
+        TextView textDate = convertView.findViewById(android.R.id.text1);
 
-        textDate.setText(task.getDate());
+        textDate.setText(task.getmDate());
         textTask.setText(task.getmTask());
 
         return convertView;

@@ -14,11 +14,21 @@ public class Tasks {
         mDate = date;
     }
 
-    public String getDate() {
+
+
+    public String getmDate() {
         return mDate;
     }
 
     public String getmTask() {
         return mTask;
+    }
+
+    public void setmTask(String task) {
+        this.mTask = task;
+    }
+
+    public void setmDate(String date) {
+        this.mDate = date;
     }
 }
