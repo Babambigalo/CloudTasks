@@ -124,11 +124,10 @@ public class ListTasks extends AppCompatActivity {
         //ArrayList<Tasks> tasks  = new ArrayList<>();
        // Log.v(TAG,"mTask = "+ dataSnapshot.getValue(Tasks.class).getmTask());
 
-        for (int ii = 1; i<=dataSnapshot.getChildrenCount();i++){
-            Log.v(TAG,"ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount());
-           Tasks task1 = new Tasks(dataSnapshot.child("task"+i).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+i).getValue(Tasks.class).getmDate());
+        for (int ii = 1; ii<=dataSnapshot.getChildrenCount();ii++){
+            Log.v(TAG,"ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount() +"   " + "ii = " + ii);
+           Tasks task1 = new Tasks(dataSnapshot.child("task"+ii).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+ii).getValue(Tasks.class).getmDate());
             tasks.add(task1);
-            ii+=1;
         }
 //        for (DataSnapshot ds : dataSnapshot.getChildren()){
 //            Log.v(TAG,"ds = " + ds + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildren());
@@ -136,6 +135,7 @@ public class ListTasks extends AppCompatActivity {
 //            tasks.add(task1);
 //            i+=1;
 //        }
+
 
 
 
