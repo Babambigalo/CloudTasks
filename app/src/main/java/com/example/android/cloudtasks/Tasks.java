@@ -14,6 +14,8 @@ public class Tasks {
         mDate = date;
     }
 
+    public Tasks(){}
+
 
 
     public String getmDate() {

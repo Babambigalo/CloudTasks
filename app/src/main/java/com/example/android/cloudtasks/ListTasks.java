@@ -33,9 +33,11 @@ public class ListTasks extends AppCompatActivity {
     private FirebaseUser user;
     private EditText ETTask;
     private EditText ETdate;
-    private ArrayList<Tasks> tasks;
+    private ArrayList<Tasks> tasks = new ArrayList<>();
     int clickNum = 1;
+    int i = 1;
     Button addTask;
+    //private ListView ListUserTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +56,14 @@ public class ListTasks extends AppCompatActivity {
         addTask = findViewById(R.id.addTask);
         ETTask = findViewById(R.id.edTask);
         ETdate = findViewById(R.id.edDate);
-        tasks = new ArrayList<>();
+        //tasks = new ArrayList<>();
         final String id = user.getUid();
-        myRef = database.getReference("Tasks");
+        myRef = database.getReference("Tasks").child(id);
+
 
 
         final TasksAdapter adapter = new TasksAdapter(ListTasks.this, tasks);
-        final ListView ListUserTasks = findViewById(R.id.lvTasks);
+       final ListView ListUserTasks = findViewById(R.id.lvTasks);
         ListUserTasks.setAdapter(adapter);
 
 //        final String taskText = ETTask.getText().toString();
@@ -80,7 +83,7 @@ public class ListTasks extends AppCompatActivity {
                     tasks.add(new Tasks(taskText, dateText));
                     Log.v(TAG, "task array " + tasks);
 
-                    myRef.child(id).child("task" + clickNum).setValue(task);
+                    myRef.child("task" + clickNum).setValue(task);
                     adapter.notifyDataSetChanged();
                     clickNum += 1;
                     ETTask.setText("");
@@ -91,12 +94,13 @@ public class ListTasks extends AppCompatActivity {
             }
         });
 
+
+        //DatabaseReference mChild =  myRef.child(id).child("task"+i);
+
         ValueEventListener taskListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                Tasks task = dataSnapshot.getValue(Tasks.class);
-
                 showData(dataSnapshot);
 
 
@@ -117,16 +121,48 @@ public class ListTasks extends AppCompatActivity {
 
 
     private void showData(DataSnapshot dataSnapshot) {
-        int i = 0;
-        ArrayList<Tasks> tasks  = new ArrayList<>();
-        String id = user.getUid()
-       for (DataSnapshot ds : dataSnapshot.getChildren()){
+        //ArrayList<Tasks> tasks  = new ArrayList<>();
+       // Log.v(TAG,"mTask = "+ dataSnapshot.getValue(Tasks.class).getmTask());
 
-           tasks.add(new Tasks(ds.child(id).child(i+1).getValue(Tasks.class).getmTask()),ds.child(id).child(i+1).getValue(Tasks.class).getmDate());
+        for (int ii = 1; i<=dataSnapshot.getChildrenCount();i++){
+            Log.v(TAG,"ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount());
+           Tasks task1 = new Tasks(dataSnapshot.child("task"+i).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+i).getValue(Tasks.class).getmDate());
+            tasks.add(task1);
+            ii+=1;
+        }
+//        for (DataSnapshot ds : dataSnapshot.getChildren()){
+//            Log.v(TAG,"ds = " + ds + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildren());
+//            Tasks task1 = new Tasks(dataSnapshot.child("task"+i).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+i).getValue(Tasks.class).getmDate());
+//            tasks.add(task1);
+//            i+=1;
+//        }
 
 
 
-       }
+
+
+
+
+//       for (DataSnapshot ds : dataSnapshot.getChildren()){
+//           if (ds.child(id).getChildren()!= null){
+//               //tasks.add();
+//               //tasks.add(new Tasks(ds.child(id).child("task" + i).getValue(Tasks.class).getmTask(),ds.child(id).child("task"+i).getValue(Tasks.class).getmDate()));
+//               i+=1;
+//               Log.v(TAG,"Key " + "task" + i+ "not found" +"  " +ds.child(id).getChildren());
+//
+//           }else{
+//               Log.v(TAG,"Key " + "task" + i+ "not found" +"  " +ds.child(id).getChildren());
+//               i+=1;
+//           }
+//       }
+        i += 1;
+        TasksAdapter adapter =new TasksAdapter(ListTasks.this,tasks);
+        ListView lv = findViewById(R.id.lvTasks);
+        lv.setAdapter(adapter);
+
+
+
+
 
 
     }
