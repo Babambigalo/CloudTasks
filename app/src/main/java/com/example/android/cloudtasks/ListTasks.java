@@ -9,9 +9,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,15 +36,21 @@ public class ListTasks extends AppCompatActivity {
     private EditText ETTask;
     private EditText ETdate;
     private ArrayList<Tasks> tasks = new ArrayList<>();
-    int clickNum = 1;
-    int i = 1;
+    ProgressBar progressBar;
+    ListView ListUserTasks;
     Button addTask;
-    //private ListView ListUserTasks;
+    Long taskNumber;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_tasks);
+
+
+
 
 
         Toolbar myToolbar = findViewById(R.id.myToolbar);
@@ -56,16 +64,9 @@ public class ListTasks extends AppCompatActivity {
         addTask = findViewById(R.id.addTask);
         ETTask = findViewById(R.id.edTask);
         ETdate = findViewById(R.id.edDate);
-        //tasks = new ArrayList<>();
-        final String id = user.getUid();
-        myRef = database.getReference("Tasks").child(id);
-
-
-
-        final TasksAdapter adapter = new TasksAdapter(ListTasks.this, tasks);
-       final ListView ListUserTasks = findViewById(R.id.lvTasks);
-        ListUserTasks.setAdapter(adapter);
-
+        myRef = database.getReference("Tasks").child(user.getUid());
+        ListUserTasks = findViewById(R.id.lvTasks);
+        progressBar = findViewById(R.id.progressBar2);
 //        final String taskText = ETTask.getText().toString();
 //        final String dateText = ETdate.getText().toString();
 
@@ -81,11 +82,11 @@ public class ListTasks extends AppCompatActivity {
                 } else {
                     Tasks task = new Tasks(taskText, dateText);
                     tasks.add(new Tasks(taskText, dateText));
-                    Log.v(TAG, "task array " + tasks);
+                    Log.v(TAG, "task array " + tasks.size());
 
-                    myRef.child("task" + clickNum).setValue(task);
-                    adapter.notifyDataSetChanged();
-                    clickNum += 1;
+
+                    myRef.child("task" + taskNumber).setValue(task);
+                    taskNumber+=1;
                     ETTask.setText("");
                     ETdate.setText("");
                     ETdate.requestFocus();
@@ -101,7 +102,9 @@ public class ListTasks extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
+
                 showData(dataSnapshot);
+
 
 
             }
@@ -117,61 +120,39 @@ public class ListTasks extends AppCompatActivity {
 
 
 
+        ListUserTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(ListTasks.this,"Item is clicked",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
     }
 
 
     private void showData(DataSnapshot dataSnapshot) {
-        //ArrayList<Tasks> tasks  = new ArrayList<>();
-       // Log.v(TAG,"mTask = "+ dataSnapshot.getValue(Tasks.class).getmTask());
+        taskNumber = dataSnapshot.getChildrenCount();
+        if (tasks.size() == 0){
+            for (int ii = 1; ii<=dataSnapshot.getChildrenCount();ii++) {
+                Log.v(TAG, "ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount() + "   " + "ii = " + ii);
+                Tasks task1 = new Tasks(dataSnapshot.child("task" + ii).getValue(Tasks.class).getmTask(), dataSnapshot.child("task" + ii).getValue(Tasks.class).getmDate());
+                tasks.add(task1);
+                //Tasks task1 = new Tasks(dataSnapshot.child("task"+dataSnapshot.getChildrenCount()).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+dataSnapshot.getChildrenCount()).getValue(Tasks.class).getmDate());
+            }
+            taskNumber+=1;
 
-        for (int ii = 1; ii<=dataSnapshot.getChildrenCount();ii++){
-            Log.v(TAG,"ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount() +"   " + "ii = " + ii);
-           Tasks task1 = new Tasks(dataSnapshot.child("task"+ii).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+ii).getValue(Tasks.class).getmDate());
-            tasks.add(task1);
+        }else{
+            Tasks task1 = new Tasks(dataSnapshot.child("task"+taskNumber).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+taskNumber).getValue(Tasks.class).getmDate());
+            taskNumber+=1;
         }
-//        for (DataSnapshot ds : dataSnapshot.getChildren()){
-//            Log.v(TAG,"ds = " + ds + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildren());
-//            Tasks task1 = new Tasks(dataSnapshot.child("task"+i).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+i).getValue(Tasks.class).getmDate());
-//            tasks.add(task1);
-//            i+=1;
-//        }
 
 
-
-
-
-
-
-
-//       for (DataSnapshot ds : dataSnapshot.getChildren()){
-//           if (ds.child(id).getChildren()!= null){
-//               //tasks.add();
-//               //tasks.add(new Tasks(ds.child(id).child("task" + i).getValue(Tasks.class).getmTask(),ds.child(id).child("task"+i).getValue(Tasks.class).getmDate()));
-//               i+=1;
-//               Log.v(TAG,"Key " + "task" + i+ "not found" +"  " +ds.child(id).getChildren());
-//
-//           }else{
-//               Log.v(TAG,"Key " + "task" + i+ "not found" +"  " +ds.child(id).getChildren());
-//               i+=1;
-//           }
-//       }
-        i += 1;
         TasksAdapter adapter =new TasksAdapter(ListTasks.this,tasks);
-        ListView lv = findViewById(R.id.lvTasks);
-        lv.setAdapter(adapter);
-
-
-
-
-
-
+        ListUserTasks.setAdapter(adapter);
     }
-
-
-
-
-
-
 
 
     @Override

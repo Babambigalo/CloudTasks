@@ -112,7 +112,6 @@ public class EmailPasswordActivity extends AppCompatActivity  {
 
                             }
 
-                            // ...
                         }
                     });
         }
