@@ -1,7 +1,9 @@
 package com.example.android.cloudtasks;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,11 +39,14 @@ public class ListTasks extends AppCompatActivity {
     private EditText ETTask;
     private EditText ETdate;
     private ArrayList<Tasks> tasks = new ArrayList<>();
-    ProgressBar progressBar;
-    ListView ListUserTasks;
-    Button addTask;
-    Long taskNumber;
-
+    private int progressValue = 0;
+    private Handler handler = new Handler();
+    private ProgressBar progressBar;
+    private ListView ListUserTasks;
+    private Button addTask;
+    private Long taskNumber;
+    private TasksAdapter adapter;
+    private ValueEventListener taskListener;
 
 
 
@@ -48,10 +54,7 @@ public class ListTasks extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_tasks);
-
-
-
-
+        Log.d(TAG,"onCreate called");
 
         Toolbar myToolbar = findViewById(R.id.myToolbar);
         setSupportActionBar(myToolbar);
@@ -67,10 +70,28 @@ public class ListTasks extends AppCompatActivity {
         myRef = database.getReference("Tasks").child(user.getUid());
         ListUserTasks = findViewById(R.id.lvTasks);
         progressBar = findViewById(R.id.progressBar2);
+        adapter = new TasksAdapter(ListTasks.this,tasks);
+        ListUserTasks.setAdapter(adapter);
+
+
+
 //        final String taskText = ETTask.getText().toString();
 //        final String dateText = ETdate.getText().toString();
 
 
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromInputMethod(ETTask.getWindowToken(),0);
+
+
+        setListeners();
+
+
+        //DatabaseReference mChild =  myRef.child(id).child("task"+i);
+
+
+    }
+
+    private void setListeners() {
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +107,7 @@ public class ListTasks extends AppCompatActivity {
 
 
                     myRef.child("task" + taskNumber).setValue(task);
-                    taskNumber+=1;
+                    taskNumber += 1;
                     ETTask.setText("");
                     ETdate.setText("");
                     ETdate.requestFocus();
@@ -95,17 +116,12 @@ public class ListTasks extends AppCompatActivity {
             }
         });
 
-
-        //DatabaseReference mChild =  myRef.child(id).child("task"+i);
-
-        ValueEventListener taskListener = new ValueEventListener() {
+        taskListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-
+                Log.d(TAG,"task 11 = " + dataSnapshot.child("task11").getValue(Tasks.class).getmTask());
                 showData(dataSnapshot);
-
-
 
             }
 
@@ -118,40 +134,34 @@ public class ListTasks extends AppCompatActivity {
         };
         myRef.addValueEventListener(taskListener);
 
-
-
         ListUserTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(ListTasks.this,"Item is clicked",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListTasks.this, "Item is clicked", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-
     }
-
 
     private void showData(DataSnapshot dataSnapshot) {
         taskNumber = dataSnapshot.getChildrenCount();
-        if (tasks.size() == 0){
-            for (int ii = 1; ii<=dataSnapshot.getChildrenCount();ii++) {
+        Log.d(TAG,"task size =" + tasks.size());
+        if (tasks.size() == 0) {
+            for (int ii = 1; ii <= dataSnapshot.getChildrenCount(); ii++) {
                 Log.v(TAG, "ds = " + dataSnapshot + "    " + "dataSnapshot.getChildren()=  " + dataSnapshot.getChildrenCount() + "   " + "ii = " + ii);
                 Tasks task1 = new Tasks(dataSnapshot.child("task" + ii).getValue(Tasks.class).getmTask(), dataSnapshot.child("task" + ii).getValue(Tasks.class).getmDate());
                 tasks.add(task1);
                 //Tasks task1 = new Tasks(dataSnapshot.child("task"+dataSnapshot.getChildrenCount()).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+dataSnapshot.getChildrenCount()).getValue(Tasks.class).getmDate());
             }
-            taskNumber+=1;
+            taskNumber += 1;
 
-        }else{
-            Tasks task1 = new Tasks(dataSnapshot.child("task"+taskNumber).getValue(Tasks.class).getmTask(),dataSnapshot.child("task"+taskNumber).getValue(Tasks.class).getmDate());
-            taskNumber+=1;
+        } else {
+            Log.d(TAG,"ADD LAST ELEMENT");
+            Tasks task1 = new Tasks(dataSnapshot.child("task" + taskNumber).getValue(Tasks.class).getmTask(), dataSnapshot.child("task" + taskNumber).getValue(Tasks.class).getmDate());
+            taskNumber += 1;
         }
 
-
-        TasksAdapter adapter =new TasksAdapter(ListTasks.this,tasks);
-        ListUserTasks.setAdapter(adapter);
+        progressBar.setVisibility(View.INVISIBLE);
+        adapter.notifyDataSetChanged();
     }
 
 
@@ -172,4 +182,32 @@ public class ListTasks extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
+    //    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        myRef = database.getReference("Tasks").child(user.getUid());
+//        myRef.addValueEventListener(taskListener);
+//    }
+//
+//
+//
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        myRef = database.getReference("Tasks").child(user.getUid());
+//        myRef.addValueEventListener(taskListener);
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        myRef = database.getReference("Tasks").child(user.getUid());
+//        myRef.addValueEventListener(taskListener);
+//    }
 }

@@ -17,10 +17,6 @@ import java.util.ArrayList;
 
 public class TasksAdapter extends ArrayAdapter<Tasks> {
 
-
-
-
-
     public TasksAdapter(Activity context, @NonNull ArrayList<Tasks> tasks) {
         super(context, 0, tasks);
     }
